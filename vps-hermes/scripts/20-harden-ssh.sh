@@ -6,6 +6,10 @@ set -Eeuo pipefail
 key_file="/home/$ADMIN_USER/.ssh/authorized_keys"
 [[ -s $key_file ]] || { echo "Chave de $ADMIN_USER não encontrada; abortando." >&2; exit 1; }
 id -nG "$ADMIN_USER" | grep -qw sudo || { echo "$ADMIN_USER não possui sudo; abortando." >&2; exit 1; }
+grep -qx "validated_by=$ADMIN_USER" /var/lib/hako/admin-sudo-validated 2>/dev/null || {
+  echo "Sudo ainda não foi validado numa nova sessão. Execute scripts/15-validate-admin.sh como $ADMIN_USER." >&2
+  exit 1
+}
 
 install -d -m 0755 /etc/ssh/sshd_config.d
 cat > /etc/ssh/sshd_config.d/90-hako-hardening.conf <<'EOF'

@@ -53,13 +53,22 @@ Internet
    sudo ADMIN_USER=lucas ADMIN_SSH_PUBLIC_KEY='ssh-ed25519 AAAA...' bash scripts/10-bootstrap-host.sh
    ```
 
-3. **Abra uma segunda sessão SSH** e confirme que `lucas` entra por chave e consegue usar
-   `sudo`. Não feche a sessão root original antes desse teste.
+3. **Abra uma segunda sessão SSH** e prove que `lucas` entra por chave e consegue usar
+   `sudo`. O marcador só é criado por uma elevação real iniciada por esse usuário:
+
+   ```bash
+   sudo ADMIN_USER=lucas bash scripts/15-validate-admin.sh
+   ```
+
+   Não feche a sessão root original antes desse teste. `sudo -n true` não é usado porque
+   esta configuração mantém sudo protegido por senha.
 4. Somente depois do teste:
 
    ```bash
    sudo ADMIN_USER=lucas bash scripts/20-harden-ssh.sh
-   sudo bash scripts/30-install-hermes.sh
+   curl --proto '=https' --tlsv1.2 -fsSL https://hermes-agent.nousresearch.com/install.sh -o /tmp/hermes-install.sh
+   sha256sum /tmp/hermes-install.sh   # revise e aprove conscientemente este valor
+   sudo HERMES_INSTALLER_SHA256='<sha256-aprovado>' bash scripts/30-install-hermes.sh
    ```
 
 5. Configure o provedor/modelo interativamente como usuário Hermes:

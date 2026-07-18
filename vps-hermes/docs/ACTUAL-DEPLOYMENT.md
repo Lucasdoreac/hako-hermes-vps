@@ -25,6 +25,16 @@ Data: 2026-07-18/19
 - O gateway precisou de `loginctl enable-linger hermes` e de uma sessão systemd do usuário.
 - O dashboard compilou os assets na primeira inicialização e ficou preso a `127.0.0.1`.
 
+## Correções após auditoria estática
+
+- novas instalações exigem senha sudo válida e uma prova feita numa segunda sessão SSH antes
+  de bloquear o login root;
+- `/usr/local/bin/hermes` passou a ser um lançador root-owned que recusa execução como root;
+- links globais para Node, npm e npx pertencentes ao usuário `hermes` foram removidos;
+- root instala apenas pacotes APT declarados; Playwright/Node rodam exclusivamente como
+  `hermes`;
+- o instalador oficial agora exige SHA-256 explicitamente aprovado.
+
 ## Segredos deliberadamente ausentes
 
 Este repositório não contém senhas, tokens OAuth, chaves privadas SSH, códigos de aparelho,

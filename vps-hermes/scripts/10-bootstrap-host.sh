@@ -21,6 +21,19 @@ apt-get install -y --no-install-recommends zram-tools || echo "Aviso: zram-tools
 
 id "$ADMIN_USER" >/dev/null 2>&1 || adduser --disabled-password --gecos '' "$ADMIN_USER"
 usermod -aG sudo "$ADMIN_USER"
+
+# Não bloqueie o SSH de root deixando um administrador incapaz de elevar
+# privilégios. Para contas novas, defina a senha fora do repositório.
+password_state=$(passwd -S "$ADMIN_USER" | awk '{print $2}')
+if [[ $password_state != P ]]; then
+  if [[ -t 0 ]]; then
+    echo "Defina agora a senha sudo de $ADMIN_USER (não será armazenada nos scripts)."
+    passwd "$ADMIN_USER"
+  else
+    echo "$ADMIN_USER não possui senha válida e não há terminal interativo; abortando." >&2
+    exit 1
+  fi
+fi
 install -d -m 0700 -o "$ADMIN_USER" -g "$ADMIN_USER" "/home/$ADMIN_USER/.ssh"
 printf '%s\n' "$ADMIN_SSH_PUBLIC_KEY" > "/home/$ADMIN_USER/.ssh/authorized_keys"
 chown "$ADMIN_USER:$ADMIN_USER" "/home/$ADMIN_USER/.ssh/authorized_keys"
@@ -52,4 +65,4 @@ ufw limit OpenSSH
 ufw --force enable
 
 systemctl enable --now ssh chrony fail2ban auditd
-echo "Bootstrap concluído. TESTE uma nova sessão SSH como $ADMIN_USER antes de endurecer o SSH."
+echo "Bootstrap concluído. Abra uma NOVA sessão SSH como $ADMIN_USER e execute scripts/15-validate-admin.sh com sudo."

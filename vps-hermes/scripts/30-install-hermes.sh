@@ -4,7 +4,12 @@ set -Eeuo pipefail
 [[ $EUID -eq 0 ]] || { echo "Execute como root." >&2; exit 1; }
 
 apt-get install -y --no-install-recommends \
-  build-essential ffmpeg libffi-dev python3-dev ripgrep \
+  build-essential ffmpeg libffi-dev python3-dev ripgrep xvfb \
+  fonts-liberation fonts-noto-color-emoji \
+  libasound2t64 libatk-bridge2.0-0t64 libatk1.0-0t64 libatspi2.0-0t64 \
+  libcairo2 libcups2t64 libdbus-1-3 libdrm2 libgbm1 libglib2.0-0t64 \
+  libnspr4 libnss3 libpango-1.0-0 libx11-6 libxcb1 libxcomposite1 \
+  libxdamage1 libxext6 libxfixes3 libxkbcommon0 libxrandr2 \
   "linux-modules-extra-$(uname -r)"
 systemctl enable --now zramswap 2>/dev/null || \
   echo "Aviso: zram não pôde ser iniciado neste kernel."
@@ -16,25 +21,40 @@ install -d -m 0700 -o hermes -g hermes /home/hermes/.hermes
 
 tmp_installer=$(mktemp)
 trap 'rm -f "$tmp_installer"' EXIT
+: "${HERMES_INSTALLER_SHA256:?Defina o SHA-256 aprovado do instalador oficial}"
 curl --proto '=https' --tlsv1.2 -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$tmp_installer"
-echo "Installer oficial SHA-256: $(sha256sum "$tmp_installer" | cut -d' ' -f1)"
+printf '%s  %s\n' "$HERMES_INSTALLER_SHA256" "$tmp_installer" | sha256sum --check --status || {
+  echo "SHA-256 do instalador não corresponde ao valor aprovado; abortando." >&2
+  exit 1
+}
+echo "Installer oficial verificado: $HERMES_INSTALLER_SHA256"
 chmod 0755 "$tmp_installer"
 sudo -u hermes -H bash "$tmp_installer" --skip-setup
 
 hermes_bin=/home/hermes/.hermes/hermes-agent/venv/bin/hermes
 [[ -x $hermes_bin ]] || { echo "Binário Hermes não encontrado após instalação." >&2; exit 1; }
-ln -sfn "$hermes_bin" /usr/local/bin/hermes
+cat > /usr/local/bin/hermes <<'EOF'
+#!/usr/bin/env bash
+set -Eeuo pipefail
+hermes_uid=$(id -u hermes)
+[[ $EUID -eq $hermes_uid ]] || {
+  echo "Recusado: execute como o usuário hermes (sudo -u hermes -H hermes ...)." >&2
+  exit 126
+}
+exec /home/hermes/.hermes/hermes-agent/venv/bin/hermes "$@"
+EOF
+chown root:root /usr/local/bin/hermes
+chmod 0755 /usr/local/bin/hermes
 
-# O instalador baixa o Chromium no perfil não privilegiado. As bibliotecas do
-# sistema são instaladas separadamente como root, conforme a documentação oficial.
+# O Chromium e qualquer JavaScript são executados somente como hermes. As
+# bibliotecas do sistema foram declaradas explicitamente no apt-get acima; root
+# nunca executa npx, Node ou Python pertencente ao usuário hermes.
 if [[ -x /home/hermes/.hermes/node/bin/npx ]]; then
-  PATH="/home/hermes/.hermes/node/bin:$PATH" HOME=/home/hermes \
-    /home/hermes/.hermes/node/bin/npx --yes playwright install-deps chromium
-  ln -sfn /home/hermes/.hermes/node/bin/node /usr/local/bin/node
-  ln -sfn /home/hermes/.hermes/node/bin/npm /usr/local/bin/npm
-  ln -sfn /home/hermes/.hermes/node/bin/npx /usr/local/bin/npx
+  sudo -u hermes -H env \
+    PATH="/home/hermes/.hermes/node/bin:/usr/bin:/bin" HOME=/home/hermes \
+    /home/hermes/.hermes/node/bin/npx playwright install chromium
 else
-  echo "Aviso: npx gerenciado não encontrado; execute depois: sudo npx playwright install-deps chromium"
+  echo "Aviso: npx gerenciado não encontrado; ferramentas de navegador podem ficar indisponíveis."
 fi
 
 cat > /home/hermes/.hermes/config.yaml <<'EOF'
@@ -99,5 +119,5 @@ EOF
 systemctl daemon-reload
 systemctl enable --now hermes-backup.timer
 
-sudo -u hermes -H "$hermes_bin" version
+sudo -u hermes -H /usr/local/bin/hermes version
 echo "Hermes instalado. Execute 'sudo -iu hermes' e depois 'hermes setup --portal' ou 'hermes model'."

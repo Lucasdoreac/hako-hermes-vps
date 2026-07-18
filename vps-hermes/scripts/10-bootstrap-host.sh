@@ -14,7 +14,8 @@ apt-get update
 apt-get -y dist-upgrade
 apt-get install -y --no-install-recommends \
   ca-certificates curl git xz-utils jq rsync ufw fail2ban unattended-upgrades \
-  apt-listchanges chrony auditd audispd-plugins aide logrotate
+  apt-listchanges chrony auditd audispd-plugins aide aide-common logrotate \
+  rclone restic
 # zram é uma melhoria opcional e não deve interromper o bootstrap se o pacote
 # não estiver disponível nos repositórios habilitados da imagem.
 apt-get install -y --no-install-recommends zram-tools || echo "Aviso: zram-tools indisponível; seguindo sem zram."

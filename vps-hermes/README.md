@@ -69,6 +69,8 @@ Internet
    curl --proto '=https' --tlsv1.2 -fsSL https://hermes-agent.nousresearch.com/install.sh -o /tmp/hermes-install.sh
    sha256sum /tmp/hermes-install.sh   # revise e aprove conscientemente este valor
    sudo HERMES_INSTALLER_SHA256='<sha256-aprovado>' bash scripts/30-install-hermes.sh
+   sudo bash scripts/40-integrity-monitoring.sh
+   sudo bash scripts/50-google-drive-backup.sh
    ```
 
 5. Configure o provedor/modelo interativamente como usuário Hermes:
@@ -94,14 +96,20 @@ privilégios root ao agente.
 - atualizações de segurança: unattended-upgrades;
 - sincronização de horário: chrony;
 - auditoria: auditd;
-- integridade: AIDE (inicialização manual após instalação);
+- integridade: AIDE com baseline e verificação diária;
 - logs persistentes e rotação: journald/logrotate;
 - backup local rotativo: script `hermes-backup` + timer systemd;
+- recuperação externa: Restic criptografado enviado ao Google Drive por rclone;
 - swap comprimida: zram quando disponível;
 - verificação básica: `scripts/90-verify.sh`.
 
-Backups locais **não substituem** cópias externas. Uma segunda etapa deve enviar backups
-criptografados para outro provedor/objeto de armazenamento.
+O backup externo exige autorização Google e uma senha Restic de pelo menos 20 caracteres.
+Essa senha deve ser guardada fora da VPS e fora do Drive usado pelo backup; sem ela não há
+restauração. O conteúdo enviado ao Drive já sai criptografado da VPS.
+
+O remote usa o escopo `drive.file`: ele acessa somente arquivos criados pelo próprio rclone.
+Um limite de quatro operações por segundo reduz erros de cota do cliente público. Para uso
+intensivo, configure um Client ID próprio conforme a documentação oficial do rclone.
 
 ## Segurança do Hermes
 

@@ -35,6 +35,26 @@ Data: 2026-07-18/19
   `hermes`;
 - o instalador oficial agora exige SHA-256 explicitamente aprovado.
 
+## Monitoramento e recuperação
+
+- auditd acompanha alterações de identidade, sudo, SSH, systemd e arquivos sensíveis do
+  Hermes;
+- AIDE possui baseline real e verificação diária;
+- Postfix, instalado como dependência de alertas locais, aceita conexões somente em loopback;
+- backup externo usa Restic com criptografia antes do envio e rclone para Google Drive;
+- a senha de recuperação Restic deve permanecer fora da VPS e do repositório.
+
+### Primeiro teste externo
+
+- snapshot: `493921bd`;
+- 48.525 arquivos e 1,077 GiB processados;
+- 354,8 MiB armazenados após compressão e deduplicação;
+- `restic check` concluído sem erros;
+- restauração isolada de `/etc/hostname` comparada com o original;
+- timer diário habilitado;
+- chave de recuperação copiada para o computador administrativo e removida da conta
+  `lucas` na VPS.
+
 ## Segredos deliberadamente ausentes
 
 Este repositório não contém senhas, tokens OAuth, chaves privadas SSH, códigos de aparelho,

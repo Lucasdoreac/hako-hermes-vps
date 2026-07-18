@@ -25,6 +25,16 @@ else
   echo "OK   /usr/local/bin/hermes recusa execução privilegiada"
 fi
 check sudo -u hermes -H /usr/local/bin/hermes doctor
+check systemctl is-active --quiet auditd
+check test -s /etc/audit/rules.d/50-hako.rules
+check systemctl is-enabled --quiet dailyaidecheck.timer
+check test -s /var/lib/aide/aide.db
+if test -s /etc/hako/restic.env; then
+  check systemctl is-enabled --quiet hako-restic-backup.timer
+  check systemctl is-active --quiet hako-restic-backup.timer
+else
+  echo "WARN backup externo ainda não configurado; execute scripts/50-google-drive-backup.sh"
+fi
 
 ss -lntup
 echo "Lembrete: valide backup externo, alertas e recuperação VNC no painel da Contabo."

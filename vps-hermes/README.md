@@ -7,6 +7,42 @@ usuário não privilegiado e não recebe `sudo`.
 > Hermes. Veja [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) para a diferença em relação ao
 > requisito original e as opções de autonomia.
 
+## Comece aqui
+
+Este repositório responde a três perguntas diferentes:
+
+| Quero entender... | Abra este documento |
+|---|---|
+| O Hermes deveria ter root? Quais são os riscos e níveis de autonomia? | **[Níveis de acesso e decisão arquitetural](docs/ARCHITECTURE.md)** |
+| O que foi realmente instalado e o que mudou durante a implantação? | **[Registro da implantação Contabo](docs/ACTUAL-DEPLOYMENT.md)** |
+| Como repetir a instalação em outra VPS? | Continue em **[Ordem segura](#ordem-segura)** |
+
+### Resumo em linguagem direta
+
+- **Sem Docker:** o Hermes foi instalado diretamente no Ubuntu.
+- **Sem root permanente:** ele opera o próprio ambiente, mas não controla todo o servidor.
+- **Vários serviços:** a VPS pode hospedar outros sistemas, preferencialmente cada um com
+  usuário, diretório e serviço próprios.
+- **Mais autonomia:** pode ser concedida por comandos administrativos específicos e
+  auditáveis, sem entregar acesso root irrestrito.
+- **Root total:** é tecnicamente possível, mas permite também ler todos os segredos,
+  desativar proteções e destruir ou comprometer todos os serviços da VPS.
+
+### Mapa rápido da instalação
+
+```text
+Internet
+   |
+   +-- SSH (única porta pública)
+          |
+          +-- lucas   -> administração do Ubuntu com sudo
+          +-- hermes  -> agente sem sudo
+                 |
+                 +-- workspace: /srv/hermes-work
+                 +-- gateway: serviço automático
+                 +-- dashboard: 127.0.0.1:9119 via túnel SSH
+```
+
 ## Ordem segura
 
 1. Copie esta pasta para a VPS sem incluir segredos.

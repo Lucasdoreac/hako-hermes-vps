@@ -7,6 +7,7 @@ local é ignorado pelo Git: caminhos, endereço e usuário não ficam presos ao 
 
 - `hako-ssh.ps1`: abre o terminal da VPS.
 - `hako-ui.ps1`: mantém o túnel do painel Hermes em `http://127.0.0.1:9119/`.
+- `hako-n8n.ps1`: mantém o túnel do n8n em `http://127.0.0.1:5678/`.
 - `hako-security-audit.ps1`: gera um relatório local somente leitura, sem coletar segredos.
 - `hako-vps-audit.ps1`: envia e executa a auditoria privilegiada e somente leitura na VPS.
 - `hako-vps-remediate.ps1`: corrige somente os achados confirmados pela auditoria, com rollback.

@@ -27,4 +27,3 @@
 - Inspect bounded logs without exposing secrets.
 - Record deployed commit and exact rollback target.
 - Do not declare success from process state alone.
-

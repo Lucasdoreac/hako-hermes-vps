@@ -37,4 +37,3 @@
 ## Large-project delegation
 
 Delegate by bounded ownership such as frontend, API, migrations, tests, or documentation. Give each worker the nearest `AGENTS.md`, exact paths, acceptance tests, and a no-deploy boundary. Integrate centrally after reviewing diffs and tests.
-

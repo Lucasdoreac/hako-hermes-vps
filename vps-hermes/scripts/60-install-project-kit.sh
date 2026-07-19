@@ -31,4 +31,3 @@ trap - EXIT
 echo "Installed: $target"
 [[ -z $backup ]] || echo "Backup: $backup"
 echo "No system packages, runtimes, Docker, MCPs or credentials were installed."
-

@@ -20,4 +20,3 @@ for cli in git rg jq python3 uv node corepack gh docker; do
 done
 
 echo 'This audit is read-only. Missing does not mean authorized to install.'
-

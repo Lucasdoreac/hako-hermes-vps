@@ -1,0 +1,4 @@
+interface:
+  display_name: "HAKO Project Kit"
+  short_description: "Bootstrap seguro para projetos grandes"
+  default_prompt: "Use $hako-project-kit para preparar um projeto novo com contexto, ferramentas, testes e plano de deploy."

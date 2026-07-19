@@ -10,6 +10,8 @@ com endurecimento de segurança, acesso via Codex e operação sem Docker.
 - **[O que foi realmente implantado na Contabo](vps-hermes/docs/ACTUAL-DEPLOYMENT.md)**
 - **[Produto de inteligência criativa e atendimento de leads](https://github.com/Lucasdoreac/hako-creative-intelligence)** — repositório privado separado
 - **[Scripts reproduzíveis](vps-hermes/scripts/)**
+- **[Preparação e acesso pelo macOS](clients/macos/README.md)**
+- **[Atalhos e auditoria local no Windows](windows/README.md)**
 
 ## Decisão principal
 

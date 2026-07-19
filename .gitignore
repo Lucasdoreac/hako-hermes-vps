@@ -1,5 +1,7 @@
 # Configuração local da VPS; nunca publicar.
 windows/hako.local.psd1
+clients/macos/hako-vps.conf
+.graphify-staging/
 
 # Checkout local do produto; possui repositório Git próprio.
 hako-creative-intelligence/

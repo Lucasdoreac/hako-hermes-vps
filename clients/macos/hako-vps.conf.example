@@ -1,0 +1,12 @@
+Host hako-vps
+    HostName 169.58.41.82
+    User lucas
+    IdentityFile ~/.ssh/hako_contabo_ed25519
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
+    PasswordAuthentication no
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+    ForwardAgent no
+    AddKeysToAgent yes
+    UseKeychain yes

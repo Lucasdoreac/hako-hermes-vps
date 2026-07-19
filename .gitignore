@@ -1,0 +1,5 @@
+# Configuração local da VPS; nunca publicar.
+windows/hako.local.psd1
+
+# Checkout local do produto; possui repositório Git próprio.
+hako-creative-intelligence/

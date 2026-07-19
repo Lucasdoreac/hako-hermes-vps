@@ -23,7 +23,9 @@ for user_name in root ubuntu lucas hermes; do
   printf '%s home=%s shell=%s\n' "$user_name" "$home" "$shell"
   if [[ -f $home/.ssh/authorized_keys ]]; then
     stat -c '%A %U:%G %n' "$home" "$home/.ssh" "$home/.ssh/authorized_keys"
-    ssh-keygen -lf "$home/.ssh/authorized_keys"
+    if ! ssh-keygen -lf "$home/.ssh/authorized_keys"; then
+      echo "authorized_keys existe, mas não contém chave pública válida"
+    fi
   else
     echo "authorized_keys ausente"
   fi

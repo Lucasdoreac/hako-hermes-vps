@@ -110,4 +110,4 @@ echo "Conta ubuntu:"
 passwd -S ubuntu || true
 getent group sudo
 sudo -l -U ubuntu 2>/dev/null || true
-systemctl status hermes-backup.service --no-pager
+systemctl status hermes-backup.service --no-pager || true

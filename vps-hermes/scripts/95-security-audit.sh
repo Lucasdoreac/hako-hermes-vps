@@ -39,6 +39,8 @@ done
 
 section "SSH efetivo"
 /usr/sbin/sshd -T | grep -E '^(permitrootlogin|passwordauthentication|pubkeyauthentication|permitemptypasswords|x11forwarding|allowtcpforwarding|gatewayports|maxauthtries|logingracetime) '
+grep -RniE '^[[:space:]]*(PasswordAuthentication|PermitRootLogin|AuthenticationMethods)' \
+  /etc/ssh/sshd_config /etc/ssh/sshd_config.d 2>/dev/null || true
 
 section "Rede e firewall"
 ss -lntup
@@ -51,6 +53,8 @@ section "Serviços e falhas"
 systemctl --failed --no-pager
 systemctl list-units --type=service --state=running --no-pager
 systemctl status hermes-backup.service hako-restic-backup.service --no-pager || true
+systemctl show hako-restic-backup.service -p NoNewPrivileges -p PrivateTmp \
+  -p ProtectSystem -p ProtectHome -p ProtectKernelTunables -p ProtectKernelModules
 journalctl -u hermes-backup.service -u hako-restic-backup.service -n 100 --no-pager
 
 section "Hermes e permissões"

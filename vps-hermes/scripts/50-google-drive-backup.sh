@@ -58,10 +58,23 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/hako/restic.env
+Environment=HOME=/root
+Environment=XDG_CACHE_HOME=/var/cache/hako-restic
+CacheDirectory=hako-restic
 ExecStart=/usr/local/sbin/hako-restic-backup
 Nice=10
 IOSchedulingClass=best-effort
 IOSchedulingPriority=7
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/cache/hako-restic
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
 EOF
 cat > /etc/systemd/system/hako-restic-backup.timer <<'EOF'
 [Unit]

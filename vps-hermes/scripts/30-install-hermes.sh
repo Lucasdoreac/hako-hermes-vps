@@ -92,8 +92,10 @@ dest=/var/backups/hermes
 install -d -m 0700 "$dest"
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 tar --create --gzip --file "$dest/hermes-$stamp.tar.gz" \
+  --ignore-failed-read --warning=no-file-changed \
   --exclude='.hermes/cache' --exclude='.hermes/hermes-agent/.git' \
   -C /home/hermes .hermes -C /srv hermes-work
+gzip -t "$dest/hermes-$stamp.tar.gz"
 chmod 0600 "$dest/hermes-$stamp.tar.gz"
 find "$dest" -type f -name 'hermes-*.tar.gz' -mtime +7 -delete
 EOF

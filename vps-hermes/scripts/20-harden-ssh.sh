@@ -12,7 +12,9 @@ grep -qx "validated_by=$ADMIN_USER" /var/lib/hako/admin-sudo-validated 2>/dev/nu
 }
 
 install -d -m 0755 /etc/ssh/sshd_config.d
-cat > /etc/ssh/sshd_config.d/90-hako-hardening.conf <<'EOF'
+# OpenSSH usa o primeiro valor encontrado. O prefixo 00 garante precedência
+# sobre arquivos de cloud-init, que podem reativar PasswordAuthentication.
+cat > /etc/ssh/sshd_config.d/00-hako-hardening.conf <<'EOF'
 PermitRootLogin no
 PasswordAuthentication no
 KbdInteractiveAuthentication no
@@ -27,7 +29,12 @@ LoginGraceTime 30
 ClientAliveInterval 300
 ClientAliveCountMax 2
 EOF
+rm -f /etc/ssh/sshd_config.d/90-hako-hardening.conf
 
 sshd -t
+effective=$(/usr/sbin/sshd -T)
+grep -qx 'permitrootlogin no' <<<"$effective"
+grep -qx 'passwordauthentication no' <<<"$effective"
+grep -qx 'authenticationmethods publickey' <<<"$effective"
 systemctl reload ssh
 echo "SSH endurecido. Mantenha esta sessão aberta e teste outra conexão imediatamente."

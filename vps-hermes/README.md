@@ -16,6 +16,7 @@ Este repositório responde a três perguntas diferentes:
 | O Hermes deveria ter root? Quais são os riscos e níveis de autonomia? | **[Níveis de acesso e decisão arquitetural](docs/ARCHITECTURE.md)** |
 | O que foi realmente instalado e o que mudou durante a implantação? | **[Registro da implantação Contabo](docs/ACTUAL-DEPLOYMENT.md)** |
 | Como repetir a instalação em outra VPS? | Continue em **[Ordem segura](#ordem-segura)** |
+| Como ambientar o Hermes e demonstrar vários projetos? | **[Primeira ambientação e showcase](docs/HERMES-FIRST-RUN.md)** |
 
 ### Resumo em linguagem direta
 

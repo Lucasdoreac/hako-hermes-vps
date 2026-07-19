@@ -4,7 +4,10 @@ set -Eeuo pipefail
 [[ $EUID -eq 0 ]] || { echo "Execute com sudo." >&2; exit 1; }
 umask 077
 
-output=${1:-/home/lucas/hako-vps-audit-$(date -u +%Y%m%dT%H%M%SZ).txt}
+report_owner=${SUDO_USER:-root}
+report_group=$(id -gn "$report_owner")
+report_home=$(getent passwd "$report_owner" | cut -d: -f6)
+output=${1:-$report_home/hako-vps-audit-$(date -u +%Y%m%dT%H%M%SZ).txt}
 exec > >(tee "$output") 2>&1
 
 section() { printf '\n## %s\n' "$1"; }
@@ -21,6 +24,8 @@ for user_name in root ubuntu lucas hermes; do
   home=$(getent passwd "$user_name" | cut -d: -f6)
   shell=$(getent passwd "$user_name" | cut -d: -f7)
   printf '%s home=%s shell=%s\n' "$user_name" "$home" "$shell"
+  passwd -S "$user_name" || true
+  chage -l "$user_name" | grep -E '^(Last password change|Password expires|Account expires)' || true
   if [[ -f $home/.ssh/authorized_keys ]]; then
     stat -c '%A %U:%G %n' "$home" "$home/.ssh" "$home/.ssh/authorized_keys"
     if ! ssh-keygen -lf "$home/.ssh/authorized_keys"; then
@@ -71,5 +76,6 @@ section "Logins recentes"
 last -n 30 -w
 journalctl -u ssh.service --since '7 days ago' --no-pager | grep -E 'Accepted|Failed|Invalid|error' | tail -n 200 || true
 
+chown "$report_owner:$report_group" "$output"
 chmod 600 "$output"
 echo "Relatório: $output"

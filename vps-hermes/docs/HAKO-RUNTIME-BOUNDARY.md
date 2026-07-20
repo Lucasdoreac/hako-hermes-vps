@@ -1,6 +1,6 @@
 # Fronteira Hermes ↔ runtimes HAKO
 
-> Status: proposta para revisão por pares.
+> Status: adotado.
 >
 > Este documento registra a separação entre o agente construtor Hermes e os produtos HAKO executados no mesmo host ou em hosts futuros.
 

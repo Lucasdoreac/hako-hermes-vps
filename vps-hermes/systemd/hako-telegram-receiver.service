@@ -1,0 +1,43 @@
+[Unit]
+Description=HAKO Telegram ingress receiver
+After=network-online.target postgresql.service hako-creative-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hako-creative
+Group=hako-creative
+WorkingDirectory=/srv/hako-creative/current
+EnvironmentFile=/etc/hako-creative/runtime.env
+EnvironmentFile=/etc/hako-creative/telegram.env
+ExecStart=/srv/hako-creative/current/.venv/bin/python tools/telegram_receiver.py
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+KillSignal=SIGTERM
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/srv/hako-creative/logs
+
+MemoryHigh=384M
+MemoryMax=512M
+TasksMax=64
+LimitNOFILE=2048
+
+[Install]
+WantedBy=multi-user.target

@@ -6,9 +6,11 @@
 
 ## 1. Princípio
 
-Hermes constrói e mantém. O runtime HAKO executa.
+Hermes constrói, mantém e pode participar do plano interativo de controle. O runtime HAKO executa e governa o domínio.
 
-A indisponibilidade do Hermes não deve interromper a rotina de um produto HAKO já implantado.
+Hermes pode, por exemplo, interpretar uma instrução natural de revisão e convertê-la em uma requisição estruturada. Ainda assim, contratos, persistência, idempotência, autorização, invalidação, execução e auditoria pertencem ao runtime HAKO.
+
+A indisponibilidade do Hermes não deve interromper a rotina de um produto HAKO já implantado nem jobs já persistidos e autorizados.
 
 Compartilhar VPS não implica compartilhar usuário, privilégios, segredos, banco, memória ou identidade operacional.
 
@@ -20,18 +22,20 @@ Compartilhar VPS não implica compartilhar usuário, privilégios, segredos, ban
 - execução de testes e validações autorizadas;
 - documentação e manutenção;
 - memória de fatos estáveis do ambiente de engenharia;
-- ferramentas necessárias para construir e diagnosticar sistemas dentro das permissões concedidas.
+- ferramentas necessárias para construir e diagnosticar sistemas dentro das permissões concedidas;
+- interpretação assistida de intenção humana no plano de controle, quando o runtime oferece uma API ou capability estruturada.
 
 ## 3. O que não pertence ao Hermes
 
-- hot path de atendimento de clientes;
+- execução canônica do domínio do produto;
 - banco operacional do produto;
 - memória conversacional de clientes;
 - perfis comerciais ou históricos identificáveis;
 - segredos de runtime disponíveis por padrão;
 - publicação ou envio de alto impacto sem gate correspondente;
 - root permanente;
-- dependência obrigatória para que o produto continue funcionando.
+- dependência obrigatória para que o produto continue funcionando;
+- capacidade de contornar contratos, idempotência, aprovação ou limites do runtime.
 
 Dados reais de clientes não devem ser promovidos para a memória cognitiva do Hermes. Quando uma tarefa de manutenção exigir inspeção de dado real, o acesso deve ser pontual, autorizado, mínimo, auditável e não persistido como memória geral do agente.
 
@@ -55,13 +59,15 @@ O administrador humano permanece a fronteira de privilégio do host. Elevação 
 
 Os canais de operação do Hermes não definem os canais dos produtos HAKO.
 
-Telegram ou qualquer bridge suportada pelo Hermes serve ao operador/desenvolvedor conforme configuração do agente. Atendimento de produção por WhatsApp deve usar o adapter oficial definido pelo produto — no primeiro caso, Meta/WhatsApp Cloud API em sandbox — e não herdar automaticamente uma bridge de WhatsApp do Hermes.
+Telegram ou qualquer bridge suportada pelo Hermes serve ao operador/desenvolvedor conforme configuração do agente. Um bot ou adapter HAKO é uma borda separada. Mesmo quando o Hermes participa do fluxo interativo, Telegram não vira fila, banco ou barramento interno.
+
+Atendimento de produção por WhatsApp deve usar o adapter oficial definido pelo produto — no primeiro caso, Meta/WhatsApp Cloud API em sandbox — e não herdar automaticamente uma bridge de WhatsApp do Hermes.
 
 ## 6. Fluxo de alteração
 
 ```text
 operador
-  -> Hermes
+  -> Hermes ou ferramenta de engenharia
   -> repositório correto
   -> branch
   -> testes
@@ -85,12 +91,12 @@ A fronteira desejada é:
 
 ```text
 Hermes plane
-  constrói / testa / mantém
+  constrói / testa / mantém / interpreta intenção autorizada
         |
-        | artefatos versionados e mudanças aprovadas
+        | requisições estruturadas, artefatos versionados e mudanças aprovadas
         v
 HAKO runtime plane
-  serviço isolado / dados próprios / políticas próprias
+  serviço isolado / dados próprios / políticas próprias / jobs persistidos
         |
         v
 Channel adapters e APIs externas

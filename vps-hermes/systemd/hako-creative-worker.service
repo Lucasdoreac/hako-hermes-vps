@@ -1,0 +1,43 @@
+[Unit]
+Description=HAKO Creative persistent job worker
+After=network-online.target postgresql.service hako-creative-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hako-creative
+Group=hako-creative
+WorkingDirectory=/srv/hako-creative/current
+EnvironmentFile=/etc/hako-creative/runtime.env
+ExecStart=/srv/hako-creative/current/.venv/bin/python tools/runtime_worker.py
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+UMask=0027
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/srv/hako-creative/assets /srv/hako-creative/cache /srv/hako-creative/logs
+
+MemoryHigh=1536M
+MemoryMax=2G
+CPUQuota=180%
+TasksMax=256
+LimitNOFILE=8192
+
+[Install]
+WantedBy=multi-user.target

@@ -6,6 +6,11 @@ on:
       - agent/bootstrap-whisper-artifact
     paths:
       - .github/workflows/bootstrap-whisper-artifact.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/bootstrap-whisper-artifact.yml
 
 permissions:
   contents: read

@@ -51,7 +51,6 @@ jobs:
               "ProtectSystem=strict",
               "ProtectHome=true",
               "PrivateTmp=true",
-              "UMask=0027",
           }
           units = sorted(Path("vps-hermes/systemd").glob("*.service"))
           assert units, "no systemd units found"
@@ -59,6 +58,7 @@ jobs:
               text = unit.read_text(encoding="utf-8")
               missing = sorted(item for item in required if item not in text)
               assert not missing, f"{unit}: missing {missing}"
+              assert "UMask=0027" in text or "UMask=0077" in text, f"{unit}: restrictive UMask required"
               assert "EnvironmentFile=/etc/hako-creative/" in text, f"{unit}: env file must stay outside Git"
               assert "ExecStart=/srv/hako-creative/current/" in text, f"{unit}: release path must use current symlink"
               assert "ReadWritePaths=" in text, f"{unit}: writable paths must be explicit"

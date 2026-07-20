@@ -11,3 +11,11 @@ hako-creative-intelligence/
 # só isso que estas linhas preservam.
 hermes-seed/
 .repowise/
+
+# Material de acesso; nunca versionar. Rede de proteção, não permissão para
+# tentar — ver vps-hermes/docs/ACESSO-VPS.md §3.
+.ssh/
+*.key
+*.pem
+.env*
+secrets/

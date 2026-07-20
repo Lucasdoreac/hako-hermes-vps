@@ -1,0 +1,42 @@
+[Unit]
+Description=HAKO Creative loopback API
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hako-creative
+Group=hako-creative
+WorkingDirectory=/srv/hako-creative/current
+EnvironmentFile=/etc/hako-creative/runtime.env
+ExecStart=/srv/hako-creative/current/.venv/bin/python app/server.py
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=20s
+KillSignal=SIGTERM
+UMask=0027
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/srv/hako-creative/assets /srv/hako-creative/cache /srv/hako-creative/logs
+
+MemoryHigh=768M
+MemoryMax=1G
+TasksMax=128
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

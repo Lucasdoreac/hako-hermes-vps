@@ -1,0 +1,74 @@
+name: runtime-services-ci
+
+on:
+  pull_request:
+    paths:
+      - "vps-hermes/systemd/**"
+      - "vps-hermes/scripts/**"
+      - "vps-hermes/env/**"
+      - ".github/workflows/runtime-services-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "vps-hermes/systemd/**"
+      - "vps-hermes/scripts/**"
+      - "vps-hermes/env/**"
+      - ".github/workflows/runtime-services-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-runtime-services:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate shell syntax
+        run: |
+          set -euo pipefail
+          while IFS= read -r script; do
+            bash -n "$script"
+          done < <(find vps-hermes/scripts -maxdepth 1 -type f -name '*.sh' -print | sort)
+
+      - name: Run shellcheck
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          mapfile -t scripts < <(find vps-hermes/scripts -maxdepth 1 -type f -name '*.sh' -print | sort)
+          shellcheck -S error "${scripts[@]}"
+
+      - name: Validate systemd safety invariants
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          required = {
+              "User=hako-creative",
+              "Group=hako-creative",
+              "NoNewPrivileges=true",
+              "ProtectSystem=strict",
+              "ProtectHome=true",
+              "PrivateTmp=true",
+          }
+          units = sorted(Path("vps-hermes/systemd").glob("*.service"))
+          assert units, "no systemd units found"
+          for unit in units:
+              text = unit.read_text(encoding="utf-8")
+              missing = sorted(item for item in required if item not in text)
+              assert not missing, f"{unit}: missing {missing}"
+              assert "UMask=0027" in text or "UMask=0077" in text, f"{unit}: restrictive UMask required"
+              assert "EnvironmentFile=/etc/hako-creative/" in text, f"{unit}: env file must stay outside Git"
+              assert "ExecStart=/srv/hako-creative/current/" in text, f"{unit}: release path must use current symlink"
+              assert "ReadWritePaths=" in text, f"{unit}: writable paths must be explicit"
+          PY
+
+      - name: Reject committed secrets and unsafe defaults
+        run: |
+          set -euo pipefail
+          ! grep -RInE '(sk-[A-Za-z0-9]{20,}|[0-9]{8,}:[A-Za-z0-9_-]{20,}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY)' vps-hermes
+          grep -RIn 'REPLACE_' vps-hermes/env/*.example >/dev/null
+          grep -n -- '--migrate' vps-hermes/scripts/install-hako-runtime.sh
+          grep -n -- '--start' vps-hermes/scripts/install-hako-runtime.sh
+          grep -n -- '--enable-telegram' vps-hermes/scripts/install-hako-runtime.sh

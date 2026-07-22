@@ -9,6 +9,12 @@ User=hako-creative
 Group=hako-creative
 WorkingDirectory=/srv/hako-creative/current
 EnvironmentFile=/etc/hako-creative/runtime.env
+# O browser do HyperFrames precisa de cache persistente fora da release, que é
+# somente leitura para o serviço. ProtectHome=true bloqueia o $HOME real, e
+# /srv/hako-creative/cache já está em ReadWritePaths. Sem estas duas linhas o
+# job render_prototype falha ao baixar/abrir o browser.
+Environment=HOME=/srv/hako-creative/cache
+Environment=XDG_CACHE_HOME=/srv/hako-creative/cache/.cache
 ExecStart=/srv/hako-creative/current/.venv/bin/python tools/runtime_worker.py
 Restart=on-failure
 RestartSec=3s

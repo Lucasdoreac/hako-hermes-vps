@@ -1,0 +1,40 @@
+[Unit]
+Description=n8n (HAKO) - orquestrador visivel, loopback only
+Documentation=https://github.com/Lucasdoreac/hako-hermes-vps/blob/main/vps-hermes/docs/N8N-SERVICE.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hako-n8n
+Group=hako-n8n
+# Dados do n8n (SQLite + config com N8N_ENCRYPTION_KEY) sob o home do servico,
+# nao mais sob a conta humana lucas. A chave mora em .n8n/config, 0600, fora do Git.
+Environment=HOME=/srv/hako-n8n
+Environment=N8N_USER_FOLDER=/srv/hako-n8n
+Environment=PATH=/srv/hako-n8n/.local/node/bin:/usr/local/bin:/usr/bin:/bin
+Environment=N8N_HOST=127.0.0.1
+Environment=N8N_LISTEN_ADDRESS=127.0.0.1
+Environment=N8N_PORT=5678
+Environment=N8N_PROTOCOL=http
+Environment=N8N_SECURE_COOKIE=false
+Environment=N8N_EDITOR_BASE_URL=http://127.0.0.1:5678/
+Environment=WEBHOOK_URL=http://127.0.0.1:5678/
+Environment=N8N_RUNNERS_ENABLED=true
+Environment=GENERIC_TIMEZONE=America/Sao_Paulo
+Environment=N8N_DIAGNOSTICS_ENABLED=false
+ExecStart=/srv/hako-n8n/.local/node/bin/n8n start
+Restart=always
+RestartSec=5
+
+# Endurecimento moderado: loopback, sem privilegio novo, escrita so no proprio home.
+# Deliberadamente conservador (ProtectSystem=full, nao strict): a unit precisa
+# sobreviver a um reboot real, entao nao se aperta o que nao se pode testar aqui.
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/hako-n8n
+
+[Install]
+WantedBy=multi-user.target

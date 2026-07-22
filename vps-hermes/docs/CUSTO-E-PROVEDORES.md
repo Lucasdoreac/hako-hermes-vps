@@ -17,10 +17,26 @@ geração usando computação local, GPU?"* — resposta na seção 6.
 
 ## 1. A resposta curta
 
-**O produto não depende de nenhum dos dois para funcionar.** O caminho que gera as variações,
-monta os previews, renderiza o protótipo e entrega no Telegram já roda ponta a ponta na VPS
-**sem chamar modelo nenhum** — 22 tarefas encadeadas, custo de token igual a zero. Isso foi
-provado em 22/07/2026 na máquina de produção.
+**A esteira roda sem provedor nenhum; a inteligência do produto ainda não está ligada.** São
+duas afirmações separadas, e confundi-las é o erro mais fácil de cometer aqui.
+
+O que está provado, em 22/07/2026, na máquina de produção: o caminho que monta as variações,
+gera os previews, renderiza o protótipo e entrega no Telegram roda ponta a ponta **sem chamar
+modelo nenhum** — 22 tarefas encadeadas, custo de token igual a zero, nenhuma falha.
+
+O que isso **não** prova: que o resultado seja bom, ou sequer que faça sentido. Custo de token
+zero significa, por definição, que **nenhum modelo escolheu nada** naquele vídeo — nem o texto,
+nem o ritmo, nem o corte. O conteúdo saiu de um template determinístico preenchido com dados de
+teste. O que foi provado é o **encanamento**: que as etapas se encadeiam, que nada se perde no
+caminho, que o vídeo chega no chat. É pré-requisito, não é o produto.
+
+Em uma frase: **hoje existe um gerador de variações bem instrumentado, alimentado à mão e
+avaliado por ninguém.** As duas pontas do laço comercial — de onde entra evidência e para onde
+volta resultado — estão vazias, e isso está levantado em detalhe no repositório de produto.
+
+Para o custo, a consequência é boa e vale dizer com todas as letras: **a conta de modelo ainda
+não começou.** O consumo até hoje é próximo de zero e o Veo nunca foi chamado. Os números
+adiante são o que vai custar quando ligar, não o que custa hoje.
 
 Modelo entra em três lugares, e só neles:
 
@@ -70,9 +86,12 @@ código legado grande e investigação de causa-raiz.
 | Haiku 4.5 (barato) | US$ 1,00 | US$ 5,00 |
 
 **Quem paga:** a camada Anthropic é **custeada pessoalmente pelo operador**, fora do orçamento do
-projeto. Ela não aparece em nenhuma fatura da empresa, não está em nenhum contrato, e se o
-operador parar de pagar, o produto continua rodando — porque, pela seção 1, o produto não depende
-dela. É custo pessoal com benefício para o projeto, e é assim que deve ser lido.
+projeto. Ela não aparece em nenhuma fatura da empresa e não está em nenhum contrato.
+
+Se o operador parar de pagar, a esteira continua rodando — pela seção 1, ela não chama modelo. O
+que ficaria parado é o trabalho de engenharia com esse assistente, e a camada conversacional
+quando existir; essa vai precisar de **algum** provedor, não necessariamente deste. É custo
+pessoal com benefício para o projeto, e é assim que deve ser lido.
 
 ---
 
@@ -209,6 +228,9 @@ independentemente de qual IA — ou nenhuma — estiver ajudando a escrever.
 - **Não é tabela de preço.** Os valores são consulta pública de 22/07/2026 e mudam sem aviso.
 - **Não mediu o custo real do projeto**, porque ele ainda não existe: o consumo de modelo até hoje
   é próximo de zero, e o Veo nunca foi chamado.
+- **Não afirma que o produto esteja pronto.** O que roda hoje é a esteira. A camada que entende
+  linguagem e escolhe o que fazer não está ligada, e é ela que vai gerar o custo descrito aqui.
+  Quem ler a seção 1 como "está funcionando" leu o encanamento como se fosse o produto.
 - **Não compara qualidade** entre os provedores por benchmark próprio. A distinção prática entre
   eles, para este projeto, é preço e disponibilidade — não capacidade.
 - **Não recomenda trocar nada.** Descreve o que cada cenário permite e o que custa.

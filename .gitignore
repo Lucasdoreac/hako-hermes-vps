@@ -5,3 +5,9 @@ clients/macos/hako-vps.conf
 
 # Checkout local do produto; possui repositório Git próprio.
 hako-creative-intelligence/
+
+# Estado local de ferramentas; nunca publicar.
+# Nenhum dos dois foi rastreado em nenhum momento — o histórico está limpo, e é
+# só isso que estas linhas preservam.
+hermes-seed/
+.repowise/

@@ -39,7 +39,20 @@ git checkout <MERGE_SHA_APROVADO>
 
 ## 3. Preparação sem start
 
-A partir do checkout deste repositório VPS:
+Antes de tudo, as dependências de sistema do renderer de protótipos. O
+`deploy-hako-runtime.sh` do repositório de produto exige `node`, `npm`, `ffmpeg`
+e `ffprobe` no PATH e **falha fechado** se faltarem — antes de trocar o symlink
+`current`, então uma máquina sem elas nunca chega a rodar código novo:
+
+```bash
+sudo vps-hermes/scripts/70-install-renderer-deps.sh --check   # só relata
+sudo vps-hermes/scripts/70-install-renderer-deps.sh           # instala
+```
+
+O browser do HyperFrames **não** entra aqui: quem o baixa é o deploy do produto,
+para dentro do cache do serviço.
+
+Depois, a partir do checkout deste repositório VPS:
 
 ```bash
 sudo vps-hermes/scripts/install-hako-runtime.sh /tmp/hako-creative-release

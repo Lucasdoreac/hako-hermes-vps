@@ -1,0 +1,55 @@
+# Unit systemd de SISTEMA do control worker HAKO.
+# Instalar como root na VPS (o usuario do servico nao tem login nem linger):
+#   sudo install -o root -g root -m 0644 deploy/hako-control-worker.service \
+#        /etc/systemd/system/hako-control-worker.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now hako-control-worker
+#
+# Consome as intents ja persistidas e executa a capability explicita do dominio.
+# Separado do receiver de proposito: a queda de um nao perde a intent do outro.
+# Segredos vem dos EnvironmentFile abaixo, FORA do Git (0640, dono hako-creative).
+[Unit]
+Description=HAKO Control Worker (executa control intents assinadas)
+After=network-online.target postgresql.service hako-creative-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=hako-creative
+Group=hako-creative
+WorkingDirectory=/srv/hako-creative/current
+# runtime.env traz DATABASE_URL e HAKO_STORAGE_ROOT; telegram.env traz o segredo
+# HMAC que valida as intents e as credenciais de publicacao no chat de origem.
+EnvironmentFile=/etc/hako-creative/runtime.env
+EnvironmentFile=/etc/hako-creative/telegram.env
+ExecStart=/srv/hako-creative/current/.venv/bin/python tools/control_worker.py
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+KillSignal=SIGTERM
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+# Escreve artefatos de preview/pacote sob HAKO_STORAGE_ROOT, igual a API.
+ReadWritePaths=/srv/hako-creative/assets /srv/hako-creative/cache /srv/hako-creative/logs
+
+MemoryHigh=384M
+MemoryMax=512M
+TasksMax=64
+LimitNOFILE=2048
+
+[Install]
+WantedBy=multi-user.target

@@ -78,13 +78,16 @@ if [[ ! -f /etc/hako-creative/telegram.env ]]; then
     /etc/hako-creative/telegram.env
 fi
 
-for unit in hako-creative-api.service hako-creative-worker.service hako-telegram-receiver.service; do
+# Units do núcleo (sempre habilitadas) e as que leem telegram.env (só com a flag).
+core_units=(hako-creative-api.service hako-creative-worker.service)
+telegram_units=(hako-telegram-receiver.service hako-control-worker.service)
+
+for unit in "${core_units[@]}" "${telegram_units[@]}"; do
   install -o root -g root -m 0644 "$repo_root/vps-hermes/systemd/$unit" "/etc/systemd/system/$unit"
 done
 systemd-analyze verify \
-  /etc/systemd/system/hako-creative-api.service \
-  /etc/systemd/system/hako-creative-worker.service \
-  /etc/systemd/system/hako-telegram-receiver.service
+  "${core_units[@]/#//etc/systemd/system/}" \
+  "${telegram_units[@]/#//etc/systemd/system/}"
 systemctl daemon-reload
 
 contains_placeholder() { grep -q 'REPLACE_' "$1"; }
@@ -106,18 +109,18 @@ if (( migrate )); then
   done
 fi
 
-systemctl enable hako-creative-api.service hako-creative-worker.service
+systemctl enable "${core_units[@]}"
 if (( enable_telegram )); then
   contains_placeholder /etc/hako-creative/telegram.env && {
-    echo 'telegram.env contém placeholders; receiver não será habilitado'; exit 1;
+    echo 'telegram.env contém placeholders; units de Telegram não serão habilitadas'; exit 1;
   }
-  systemctl enable hako-telegram-receiver.service
+  systemctl enable "${telegram_units[@]}"
 fi
 
 if (( start )); then
-  systemctl restart hako-creative-api.service hako-creative-worker.service
+  systemctl restart "${core_units[@]}"
   if (( enable_telegram )); then
-    systemctl restart hako-telegram-receiver.service
+    systemctl restart "${telegram_units[@]}"
   fi
 fi
 

@@ -62,7 +62,11 @@ run() {
   # acima — que respondem `inactive`/vazio e induzem ao diagnóstico errado de
   # "processo solto". Ver docs/N8N-SERVICE.md.
   section "Units relevantes (gerenciadores de USUÁRIO)"
-  for u in $(ls /var/lib/systemd/linger/ 2>/dev/null); do
+  linger_encontrado=0
+  for entry in /var/lib/systemd/linger/*; do
+    [[ -e "$entry" ]] || continue   # glob sem match volta literal; ignore
+    linger_encontrado=1
+    u="$(basename "$entry")"
     printf -- '-- usuário %s (linger habilitado) --\n' "$u"
     if [[ "$(id -un 2>/dev/null)" == "$u" ]]; then
       systemctl --user list-units --type=service --all --no-pager 2>/dev/null \
@@ -73,7 +77,7 @@ run() {
       echo "não inspecionável desta sessão; rode o preflight como $u"
     fi
   done
-  [[ -d /var/lib/systemd/linger ]] || echo "nenhum usuário com linger"
+  (( linger_encontrado )) || echo "nenhum usuário com linger"
 
   # Cgroup é a evidência que não mente sobre quem supervisiona o processo.
   section "Supervisão real dos processos n8n (cgroup)"

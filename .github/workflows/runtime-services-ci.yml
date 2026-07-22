@@ -42,11 +42,12 @@ jobs:
       - name: Validate systemd safety invariants
         run: |
           python3 - <<'PY'
+          import re
           from pathlib import Path
 
-          required = {
-              "User=hako-creative",
-              "Group=hako-creative",
+          # Endurecimento universal: vale para toda unit de servico, seja do runtime
+          # hako-creative ou de outro servico isolado (ex.: hako-n8n, ADR-016/#51).
+          universal = {
               "NoNewPrivileges=true",
               "ProtectSystem=strict",
               "ProtectHome=true",
@@ -56,12 +57,24 @@ jobs:
           assert units, "no systemd units found"
           for unit in units:
               text = unit.read_text(encoding="utf-8")
-              missing = sorted(item for item in required if item not in text)
+              missing = sorted(item for item in universal if item not in text)
               assert not missing, f"{unit}: missing {missing}"
               assert "UMask=0027" in text or "UMask=0077" in text, f"{unit}: restrictive UMask required"
-              assert "EnvironmentFile=/etc/hako-creative/" in text, f"{unit}: env file must stay outside Git"
-              assert "ExecStart=/srv/hako-creative/current/" in text, f"{unit}: release path must use current symlink"
               assert "ReadWritePaths=" in text, f"{unit}: writable paths must be explicit"
+
+              # Todo servico roda sob usuario/grupo dedicado e nao-root (nunca root).
+              m_user = re.search(r"^User=(\S+)", text, re.M)
+              m_group = re.search(r"^Group=(\S+)", text, re.M)
+              assert m_user and m_user.group(1) != "root", f"{unit}: dedicated non-root User= required"
+              assert m_group and m_group.group(1) != "root", f"{unit}: dedicated non-root Group= required"
+
+              # Invariantes especificas do runtime hako-creative (env e release por
+              # symlink) so se aplicam as units desse usuario; outros servicos
+              # isolados tem seus proprios caminhos.
+              if m_user.group(1) == "hako-creative":
+                  assert "Group=hako-creative" in text, f"{unit}: hako-creative unit needs Group=hako-creative"
+                  assert "EnvironmentFile=/etc/hako-creative/" in text, f"{unit}: env file must stay outside Git"
+                  assert "ExecStart=/srv/hako-creative/current/" in text, f"{unit}: release path must use current symlink"
           PY
 
       - name: Reject committed secrets and unsafe defaults

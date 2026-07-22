@@ -27,13 +27,14 @@ ExecStart=/srv/hako-n8n/.local/node/bin/n8n start
 Restart=always
 RestartSec=5
 
-# Endurecimento moderado: loopback, sem privilegio novo, escrita so no proprio home.
-# Deliberadamente conservador (ProtectSystem=full, nao strict): a unit precisa
-# sobreviver a um reboot real, entao nao se aperta o que nao se pode testar aqui.
+# Endurecimento no mesmo nivel das units do runtime hako-creative: loopback, sem
+# privilegio novo, resto do sistema read-only, escrita so no proprio home.
+# n8n escreve apenas em N8N_USER_FOLDER (/srv/hako-n8n) e no /tmp privado.
 NoNewPrivileges=true
-ProtectSystem=full
+ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
+UMask=0077
 ReadWritePaths=/srv/hako-n8n
 
 [Install]

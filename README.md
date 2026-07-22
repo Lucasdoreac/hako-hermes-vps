@@ -22,8 +22,8 @@ do conjunto de 12 explicitamente medido pela #85.
 ## Inventário classificável da infraestrutura
 
 O critério é o mesmo da #85: `estado` só vale com data + comando de verificação; `decisão` preserva
-o porquê; `intenção viva` aponta para issue; `intenção morta` precisa de marcador histórico;
-`duplicata` deve ser apagada, não acumulada no índice.
+o porquê ou um runbook normativo; `intenção viva` aponta para issue; `intenção morta` precisa de
+marcador histórico; `duplicata` deve ser apagada, não acumulada no índice.
 
 | Documento | Categoria | Evidência / rastreio | Papel |
 |---|---|---|---|
@@ -34,7 +34,7 @@ o porquê; `intenção viva` aponta para issue; `intenção morta` precisa de ma
 | [ARCHITECTURE.md](vps-hermes/docs/ARCHITECTURE.md) | `decisão` | — | Níveis de autonomia, privilégios e risco do Hermes. |
 | [ACTUAL-DEPLOYMENT.md](vps-hermes/docs/ACTUAL-DEPLOYMENT.md) | `estado` | 2026-07-22 · `sudo bash vps-hermes/scripts/90-verify.sh` | Registro do que está instalado e das exceções observáveis. |
 | [HAKO-CREATIVE-DEPLOY.md](vps-hermes/docs/HAKO-CREATIVE-DEPLOY.md) | `decisão` | — | Contrato/runbook de deploy do produto no host, sem ser fonte do domínio. |
-| [HAKO-CREATIVE-RESTART-CLEAN.md](vps-hermes/docs/HAKO-CREATIVE-RESTART-CLEAN.md) | `intenção morta` | — | Runbook do restart clean já executado; preservado como registro. |
+| [HAKO-CREATIVE-RESTART-CLEAN.md](vps-hermes/docs/HAKO-CREATIVE-RESTART-CLEAN.md) | `decisão` | — | Runbook normativo de restart clean e suas condições de segurança/rollback. |
 | [ISOLAMENTO-DE-RECURSOS.md](vps-hermes/docs/ISOLAMENTO-DE-RECURSOS.md) | `decisão` | — | Política de isolamento de usuários, recursos e serviços compartilhando VPS. |
 | [HAKO-RUNTIME-BOUNDARY.md](vps-hermes/docs/HAKO-RUNTIME-BOUNDARY.md) | `decisão` | — | Fronteira adotada entre Hermes construtor e runtimes HAKO. |
 | [HAKO-CICD-DEPLOY.md](vps-hermes/docs/HAKO-CICD-DEPLOY.md) | `estado` | 2026-07-22 · `sudo bash vps-hermes/scripts/90-verify.sh` | Integração versionada de CI/CD com o host. |

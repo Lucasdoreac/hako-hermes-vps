@@ -104,8 +104,28 @@ pessoal com benefício para o projeto, e é assim que deve ser lido.
 | VPS (6 vCPU, 12 GB, sem GPU) | opex mensal | já contratada, já em uso |
 | APIs de modelo | opex variável | paga por uso, sem mínimo |
 | Veo (vídeo) | opex variável | paga por segundo gerado |
-| Licenças de software | — | nenhuma; toda a base é aberta |
+| Licença Remotion | **opex mensal**, se aplicável | ver abaixo — depende de quem detém a IP |
+| Demais licenças | — | nenhuma; HyperFrames é Apache 2.0, o resto é aberto |
 | Hardware de GPU | seria o único capex | **não comprado, e a seção 6 explica por quê** |
+
+### A licença do Remotion, com precisão
+
+Três coisas costumam ser confundidas, e as três são verdade ao mesmo tempo:
+
+- **O código é público e auto-hospedável.** Dá para clonar, rodar o Studio numa porta local,
+  modificar e renderizar na própria máquina.
+- **Não é open source no sentido da OSI.** A licença é proprietária e traz condições que
+  nenhuma licença aprovada tem. Código visível não é uso livre.
+- **Auto-hospedar não isenta.** A cobrança é pelo *uso do software*, não pela hospedagem;
+  render local ou em servidor próprio continua dentro do licenciamento.
+
+Uso livre cobre indivíduos, organizações com **até 3 funcionários** e entidades sem fins
+lucrativos. Acima disso, Company License a partir de ~US$ 100/mês (ou US$ 0,01/render).
+
+**Quem paga é quem detém a IP do projeto**, não necessariamente quem escreve o código — e em
+colaboração entre times **o headcount soma**. Neste projeto a titularidade da IP não está
+definida por escrito, então o custo não está atribuído. É uma pergunta a fechar, não um valor
+a orçar.
 
 A consequência prática: **não há nada para amortizar e nada para encalhar.** Se o projeto parar,
 para-se de pagar. Se dobrar de volume, o custo dobra junto — não há degrau de investimento no
@@ -125,12 +145,17 @@ O vídeo final é gerado pelo Veo, do Google. É aqui que está a dependência r
 - a chave não está no projeto. Nenhum teste de Veo foi feito até hoje por falta desse acesso.
 
 Ordem de grandeza de consulta pública em jul/2026: entre **US$ 0,15 e US$ 0,75 por segundo** de
-vídeo, conforme a variante e a resolução. Um vídeo de 10 segundos fica na casa de poucos dólares.
-Cobra-se só o que é gerado com sucesso.
+vídeo, conforme a variante e a resolução. Cobra-se só o que é gerado com sucesso.
 
-**Por que isso importa para o custo:** vídeo é a única coisa cara aqui. Um lote de 10 variações
-custa centavos até o momento em que vira vídeo — e aí passa a custar dólares. Daí a arquitetura da
-seção 7.
+Duas restrições do modelo que mudam a conta, e que só descobrimos em 22/07:
+
+- **cada geração dá 4, 6 ou 8 segundos.** Um anúncio de 30 s são 4 a 6 gerações encadeadas, não
+  uma;
+- logo, **um anúncio de 30 s custa US$ 4,50 a 22,50 por variante.** Dez variantes: US$ 45 a 225.
+
+**Por que isso importa:** vídeo é a única coisa cara aqui, e agora com número. Um lote custa
+centavos até o momento em que vira vídeo. Daí a arquitetura da seção 7 — e daí "muitas variantes"
+valer na etapa criativa, nunca no Veo.
 
 ---
 

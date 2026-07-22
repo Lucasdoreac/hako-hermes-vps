@@ -54,9 +54,37 @@ run() {
     fi
   done
 
-  section "Units relevantes"
+  section "Units relevantes (gerenciador de SISTEMA)"
   systemctl list-unit-files --no-pager 2>/dev/null | grep -Ei '(^|\s)(hako|hermes|n8n|postgresql)' || true
   systemctl list-units --all --no-pager 2>/dev/null | grep -Ei '(^|\s)(hako|hermes|n8n|postgresql)' || true
+
+  # O n8n roda como unit `systemd --user` de `lucas`, invisível aos dois comandos
+  # acima — que respondem `inactive`/vazio e induzem ao diagnóstico errado de
+  # "processo solto". Ver docs/N8N-SERVICE.md.
+  section "Units relevantes (gerenciadores de USUÁRIO)"
+  linger_encontrado=0
+  for entry in /var/lib/systemd/linger/*; do
+    [[ -e "$entry" ]] || continue   # glob sem match volta literal; ignore
+    linger_encontrado=1
+    u="$(basename "$entry")"
+    printf -- '-- usuário %s (linger habilitado) --\n' "$u"
+    if [[ "$(id -un 2>/dev/null)" == "$u" ]]; then
+      systemctl --user list-units --type=service --all --no-pager 2>/dev/null \
+        | grep -Ei '(^|\s)(hako|hermes|n8n)' || true
+      systemctl --user list-unit-files --no-pager 2>/dev/null \
+        | grep -Ei '(^|\s)(hako|hermes|n8n)' || true
+    else
+      echo "não inspecionável desta sessão; rode o preflight como $u"
+    fi
+  done
+  (( linger_encontrado )) || echo "nenhum usuário com linger"
+
+  # Cgroup é a evidência que não mente sobre quem supervisiona o processo.
+  section "Supervisão real dos processos n8n (cgroup)"
+  for pid in $(pgrep -f 'n8n' 2>/dev/null); do
+    printf '%-8s %-10s %s\n' "$pid" "$(ps -o user= -p "$pid" 2>/dev/null)" \
+      "$(cat /proc/"$pid"/cgroup 2>/dev/null | head -n 1)"
+  done
 
   section "Portas em escuta"
   ss -lntup 2>/dev/null || ss -lnt 2>/dev/null || true

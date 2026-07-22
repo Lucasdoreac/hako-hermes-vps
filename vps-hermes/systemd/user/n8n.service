@@ -1,0 +1,24 @@
+[Unit]
+Description=n8n (HAKO) - loopback only
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=PATH=%h/.local/node/bin:/usr/local/bin:/usr/bin:/bin
+Environment=N8N_HOST=127.0.0.1
+Environment=N8N_LISTEN_ADDRESS=127.0.0.1
+Environment=N8N_PORT=5678
+Environment=N8N_PROTOCOL=http
+Environment=N8N_SECURE_COOKIE=false
+Environment=N8N_EDITOR_BASE_URL=http://127.0.0.1:5678/
+Environment=WEBHOOK_URL=http://127.0.0.1:5678/
+Environment=N8N_RUNNERS_ENABLED=true
+Environment=GENERIC_TIMEZONE=America/Sao_Paulo
+Environment=N8N_DIAGNOSTICS_ENABLED=false
+ExecStart=%h/.local/node/bin/n8n start
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -97,7 +97,10 @@ A decisão fica registrada como aberta, sem recomendação de prazo.
 
 1. **Serviço crítico preso a uma conta humana** (ver acima).
 2. **Colisão de porta do task broker** com a CLI (ver acima).
-3. **`~/.local/node` é a mesma toolchain do renderer de protótipos.** Um upgrade de
-   Node feito para o HyperFrames troca o interpretador do n8n junto. Não há gestor
-   de pacotes envolvido: a instalação é manual, sem registro de origem nem de como
-   atualizá-la.
+3. **O Node do n8n é uma instalação manual, sem gestor de pacotes.**
+   `~lucas/.local/node` (v22.23.1) não tem origem registrada nem caminho de
+   atualização definido. É **separado** do Node do sistema
+   (`/usr/bin/node`, v24.18.0, pacote `nodejs` do NodeSource), que é o usado pelo
+   renderer de protótipos — então um upgrade feito para o HyperFrames **não**
+   toca no interpretador do n8n. Os dois envelhecem de forma independente, e só
+   um deles tem procedência.
